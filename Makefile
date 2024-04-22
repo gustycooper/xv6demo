@@ -139,7 +139,7 @@ UPROGS=\
 	$U/_find\
 	$U/_xargs\
 
-fs.img: mkfs/mkfs README $(UPROGS)
+fs.img: mkfs/mkfs README kittycat.txt $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
 
 -include kernel/*.d user/*.d
