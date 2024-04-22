@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -55,6 +56,8 @@ sys_sleep(void)
   uint ticks0;
 
   argint(0, &n);
+  if(n < 0)
+    n = 0;
   acquire(&tickslock);
   ticks0 = ticks;
   while(ticks - ticks0 < n){
@@ -88,4 +91,48 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64
+sys_trace(void)
+{
+  int n;
+  argint(0, &n);
+  myproc()->mask = n;
+  return 0;
+}
+
+uint64
+sys_sysinfo(void)
+{
+  struct sysinfo info;
+  info.freemem = get_freemem();
+  info.nproc = get_nproc();
+
+  uint64 addr;
+  argaddr(0, &addr);
+  // kernel cannot directly access user space. use copyout()
+  return copyout(myproc()->pagetable, addr, (char*)&info, sizeof(info));
+}
+
+int rseedv = 0;
+
+uint64
+sys_rseed(void)
+{
+  int n;
+  argint(0, &n);
+  rseedv = n;
+  return 0;
+}
+
+#define MY_RAND_MAX ((1U << 31) - 1)
+
+uint64
+sys_rinter(void)
+{
+  int max;
+  argint(0, &max);
+  rseedv = ((rseedv * 1103515245 + 12345) & MY_RAND_MAX);
+  return rseedv % max;
 }
