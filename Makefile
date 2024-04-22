@@ -150,6 +150,7 @@ UPROGS=\
 	$U/_array\
 	$U/_ptr\
 	$U/_str\
+	$U/_lss\
 
 fs.img: mkfs/mkfs README kittycat.txt $(UPROGS)
 	mkfs/mkfs fs.img README kittycat.txt $(UPROGS)
