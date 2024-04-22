@@ -138,6 +138,18 @@ UPROGS=\
 	$U/_primes\
 	$U/_find\
 	$U/_xargs\
+	$U/_ex1\
+	$U/_ex2\
+	$U/_ex3\
+	$U/_ex4\
+	$U/_ex5\
+	$U/_ex6\
+	$U/_ex7\
+	$U/_ex8\
+	$U/_ex9\
+	$U/_array\
+	$U/_ptr\
+	$U/_str\
 
 fs.img: mkfs/mkfs README kittycat.txt $(UPROGS)
 	mkfs/mkfs fs.img README kittycat.txt $(UPROGS)
