@@ -18,6 +18,7 @@ fmtname(char *path)
   if(strlen(p) >= DIRSIZ)
     return p;
   memmove(buf, p, strlen(p));
+  memset(buf+strlen(p), 0, 1);
   //memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
   return buf;
 }
