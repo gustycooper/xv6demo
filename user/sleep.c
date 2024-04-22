@@ -5,6 +5,10 @@
 int
 main(int argc, char *argv[])
 {
-  fprintf(1, "sleep does not work\n");
+  if(argc < 2){
+    fprintf(2, "Usage: sleep <ticks>\n");
+    exit(1);
+  }
+  sleep(atoi(argv[1]));
   exit(0);
 }
