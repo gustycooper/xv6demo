@@ -105,6 +105,7 @@ extern uint64 sys_trace(void);
 extern uint64 sys_sysinfo(void);
 extern uint64 sys_rseed(void);
 extern uint64 sys_rinter(void);
+extern uint64 sys_ps(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -134,6 +135,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_sysinfo] sys_sysinfo,
 [SYS_rseed]   sys_rseed,
 [SYS_rinter]  sys_rinter,
+[SYS_ps]      sys_ps,
 };
 
 static char *syscall_name[] = {

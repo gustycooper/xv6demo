@@ -24,3 +24,4 @@
 #define SYS_sysinfo 23
 #define SYS_rseed  24
 #define SYS_rinter 25
+#define SYS_ps     26

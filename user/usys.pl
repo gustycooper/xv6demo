@@ -40,3 +40,4 @@ entry("trace");
 entry("sysinfo");
 entry("rseed");
 entry("rinter");
+entry("ps");

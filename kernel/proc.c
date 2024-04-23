@@ -696,3 +696,22 @@ get_nproc()
   }
   return n;
 }
+
+int
+ps()
+{
+//Should I enable interrupts or get a lock
+  struct proc *p;
+
+  printf("\n");
+  printf("name \t pid \t state \t priority \n");
+  for(p = proc; p < &proc[NPROC]; p++){
+    if(p->state == SLEEPING)
+      printf("%s \t %d \t SLEEPING \t %d \n ", p->name,p->pid,p->priority);
+    else if(p->state == RUNNING)
+      printf("%s \t %d \t RUNNING \t %d \n ", p->name,p->pid,p->priority);
+    else if(p->state == RUNNABLE)
+      printf("%s \t %d \t RUNNABLE \t %d \n ", p->name,p->pid,p->priority);
+  }
+  return 22;
+}

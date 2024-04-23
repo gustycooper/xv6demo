@@ -27,6 +27,7 @@ int trace(int);
 int sysinfo(struct sysinfo*);
 int rseed(int);
 int rinter(int);
+int ps(void);
 
 // ulib.c
 int stat(const char*, struct stat*);

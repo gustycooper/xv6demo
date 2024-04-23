@@ -136,3 +136,9 @@ sys_rinter(void)
   rseedv = ((rseedv * 1103515245 + 12345) & MY_RAND_MAX);
   return rseedv % max;
 }
+
+uint64
+sys_ps(void)
+{
+  return ps();
+}

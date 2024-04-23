@@ -92,6 +92,7 @@ struct proc {
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
   int mask;                    // for syscall trace
+  int priority                 // for future scheduling
 
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
