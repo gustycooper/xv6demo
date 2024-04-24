@@ -164,6 +164,7 @@ static char *syscall_name[] = {
 [SYS_sysinfo] "sysinfo",
 [SYS_rseed]   "rseed",
 [SYS_rinter]  "rinter",
+[SYS_ps]      "ps",
 };
 
 void

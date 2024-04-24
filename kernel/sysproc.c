@@ -140,5 +140,5 @@ sys_rinter(void)
 uint64
 sys_ps(void)
 {
-  return ps();
+  return procdump();
 }
