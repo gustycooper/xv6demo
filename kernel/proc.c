@@ -15,6 +15,9 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
+// assigne scheduler_policy = SCHED_PRIOR for priority scheduler
+int scheduler_policy = SCHED_RR;
+
 extern void forkret(void);
 static void freeproc(struct proc *p);
 
@@ -124,6 +127,7 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->priority = DEF_PRIOR;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -169,6 +173,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->priority = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -454,21 +459,52 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+    if (scheduler_policy == SCHED_RR) {
+      for(p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if(p->state == RUNNABLE) {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+        release(&p->lock);
       }
-      release(&p->lock);
+    }
+    else { // scheduler_policy == SCHED_PRIOR
+      struct proc *selected = 0;
+      int highest_priority = -1;
+
+      for(p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if(p->state == RUNNABLE) {
+          // priority adjusted based on how long the process has been waiting
+          // int aging_factor = currtime - p->readytime;
+          // int effective_priority = p->priority + aging_factor;
+          // ignore aging for now
+          int effective_priority = p->priority;
+          if (effective_priority > highest_priority) {
+            highest_priority = effective_priority;
+            selected = p;
+          }
+        }
+        release(&p->lock);
+      }
+
+      if (selected) {
+        acquire(&selected->lock);
+        selected->state = RUNNING;
+        c->proc = selected;
+        swtch(&c->context, &selected->context);
+        c->proc = 0;
+        release(&selected->lock);
+      }
     }
   }
 }
