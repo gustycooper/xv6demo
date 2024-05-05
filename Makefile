@@ -155,6 +155,9 @@ UPROGS=\
 	$U/_sysinfotest\
 	$U/_randomtest\
 	$U/_ps\
+	$U/_alarmtest\
+	$U/_call\
+	$U/_bttest
 
 fs.img: mkfs/mkfs README kittycat.txt $(UPROGS)
 	mkfs/mkfs fs.img README kittycat.txt $(UPROGS)
