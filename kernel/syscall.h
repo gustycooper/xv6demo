@@ -25,3 +25,5 @@
 #define SYS_rseed  24
 #define SYS_rinter 25
 #define SYS_ps     26
+#define SYS_sigalarm 27
+#define SYS_sigreturn 28

@@ -143,3 +143,22 @@ sys_ps(void)
   procdump();
   return 0;
 }
+
+uint64
+sys_sigalarm(void)
+{
+  struct proc* p = myproc();
+  argint(0, &p->interval);
+  argaddr(1, &p->handler);
+  p->regs = p->trapframe + sizeof(struct trapframe);
+  return 0;
+}
+
+uint64
+sys_sigreturn(void)
+{
+  struct proc* p = myproc();
+  memmove(p->trapframe, p->regs, sizeof(struct trapframe));
+  p->ticks = 0;
+  return p->trapframe->a0;
+}

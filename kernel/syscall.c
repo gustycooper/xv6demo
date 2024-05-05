@@ -106,6 +106,8 @@ extern uint64 sys_sysinfo(void);
 extern uint64 sys_rseed(void);
 extern uint64 sys_rinter(void);
 extern uint64 sys_ps(void);
+extern uint64 sys_sigalarm(void);
+extern uint64 sys_sigreturn(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -136,6 +138,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_rseed]   sys_rseed,
 [SYS_rinter]  sys_rinter,
 [SYS_ps]      sys_ps,
+[SYS_sigalarm] sys_sigalarm,
+[SYS_sigreturn] sys_sigreturn,
 };
 
 static char *syscall_name[] = {
@@ -165,6 +169,8 @@ static char *syscall_name[] = {
 [SYS_rseed]   "rseed",
 [SYS_rinter]  "rinter",
 [SYS_ps]      "ps",
+[SYS_sigalarm] "sigalarm",
+[SYS_sigreturn] "sigreturn",
 };
 
 void

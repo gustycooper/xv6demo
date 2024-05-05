@@ -41,3 +41,5 @@ entry("sysinfo");
 entry("rseed");
 entry("rinter");
 entry("ps");
+entry("sigalarm");
+entry("sigreturn");

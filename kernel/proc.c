@@ -15,8 +15,12 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
-// assigne scheduler_policy = SCHED_PRIOR for priority scheduler
+// assign scheduler_policy = SCHED_PRIOR for priority scheduler
 int scheduler_policy = SCHED_RR;
+
+// History of procs scheduled
+struct prochist prochist[HIST_SIZE];
+int hist_i = 0;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -149,6 +153,11 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+
+  p->interval = 0;
+  p->handler = 0;
+  p->ticks = 0;
+  p->regs = 0;
 
   return p;
 }
@@ -463,6 +472,11 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
+          // Update prochist
+          prochist[hist_i].pid = p->pid;
+          safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
+          hist_i = (hist_i + 1) % HIST_SIZE;
+
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
           // before jumping back to us.
