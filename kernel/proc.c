@@ -476,10 +476,12 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
-          // Update prochist
-          prochist[hist_i].pid = p->pid;
-          safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
-          hist_i = (hist_i + 1) % HIST_SIZE;
+          // Update prochist if not timer that reruns same proc
+          if (!(hist_i && prochist[hist_i - 1].pid == p->pid)) { 
+            prochist[hist_i].pid = p->pid;
+            safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
+            hist_i = (hist_i + 1) % HIST_SIZE;
+          }
 
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
