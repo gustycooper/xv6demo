@@ -28,6 +28,7 @@ int sysinfo(struct sysinfo*);
 int rseed(int);
 int rinter(int);
 int ps(void);
+int prochist(void);
 int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
 

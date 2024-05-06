@@ -145,6 +145,13 @@ sys_ps(void)
 }
 
 uint64
+sys_prochist(void)
+{
+  prochist();
+  return 0;
+}
+
+uint64
 sys_sigalarm(void)
 {
   struct proc* p = myproc();

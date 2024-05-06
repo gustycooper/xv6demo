@@ -738,6 +738,17 @@ procdump(void)
   }
 }
 
+// Display process history to console
+void
+prochist()
+{
+  int n = 0;
+  for(int i=0; i<hist_i; i++){
+    printf("%d %s", prochist[i]->pid, prochist[i]->name);
+    printf("\n");
+  }
+}
+
 // get the number of processes whose state is not UNUSED
 int
 get_nproc()

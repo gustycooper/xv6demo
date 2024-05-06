@@ -157,7 +157,8 @@ UPROGS=\
 	$U/_ps\
 	$U/_alarmtest\
 	$U/_call\
-	$U/_bttest
+	$U/_bttest\
+	$U/_prochist
 
 fs.img: mkfs/mkfs README kittycat.txt $(UPROGS)
 	mkfs/mkfs fs.img README kittycat.txt $(UPROGS)
