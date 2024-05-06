@@ -477,7 +477,7 @@ scheduler(void)
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
           // Update prochist if not timer that reruns same proc
-          if (prev_hist_i != hist_i && prochist[prev_hist_i].pid != p->pid) { 
+          if (prochist[prev_hist_i].pid != p->pid) { 
             prochist[hist_i].pid = p->pid;
             safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
             prev_hist_i = hist_i;
