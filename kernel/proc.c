@@ -20,7 +20,7 @@ int scheduler_policy = SCHED_RR;
 
 // History of procs scheduled
 struct prochist prochist[HIST_SIZE];
-int hist_i = 0;
+int hist_i = 0, prev_hist_i = 0;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -477,9 +477,10 @@ scheduler(void)
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
           // Update prochist if not timer that reruns same proc
-          if (!(hist_i && prochist[hist_i - 1].pid == p->pid)) { 
+          if (prev_hist_i != hist_i && prochist[prev_hist_i].pid != p->pid) { 
             prochist[hist_i].pid = p->pid;
             safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
+            prev_hist_i = hist_i;
             hist_i = (hist_i + 1) % HIST_SIZE;
           }
 
