@@ -43,3 +43,4 @@ entry("rinter");
 entry("ps");
 entry("sigalarm");
 entry("sigreturn");
+entry("prochist");
