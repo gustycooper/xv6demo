@@ -183,6 +183,10 @@ freeproc(struct proc *p)
   p->xstate = 0;
   p->state = UNUSED;
   p->priority = 0;
+  p->interval = 0;
+  p->handler = 0;
+  p->ticks = 0;
+  p->regs = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -746,23 +750,3 @@ get_nproc()
   }
   return n;
 }
-/*
-int
-ps()
-{
-//Should I enable interrupts or get a lock
-  struct proc *p;
-
-  printf("\n");
-  printf("name \t pid \t state \t priority \n");
-  for(p = proc; p < &proc[NPROC]; p++){
-    if(p->state == SLEEPING)
-      printf("%s \t %d \t SLEEPING \t %d \n ", p->name,p->pid,p->priority);
-    else if(p->state == RUNNING)
-      printf("%s \t %d \t RUNNING \t %d \n ", p->name,p->pid,p->priority);
-    else if(p->state == RUNNABLE)
-      printf("%s \t %d \t RUNNABLE \t %d \n ", p->name,p->pid,p->priority);
-  }
-  return 22;
-}
-*/
