@@ -746,7 +746,7 @@ get_nproc()
   }
   return n;
 }
-
+/*
 int
 ps()
 {
@@ -765,3 +765,4 @@ ps()
   }
   return 22;
 }
+*/
