@@ -21,6 +21,7 @@ int scheduler_policy = SCHED_RR;
 // History of procs scheduled
 struct prochist prochist[HIST_SIZE];
 int hist_i = 0, prev_hist_i = 0;
+struct spinlock hist_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -58,6 +59,7 @@ procinit(void)
 
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
+  initlock(&hist_lock, "hist_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
@@ -477,12 +479,14 @@ scheduler(void)
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
           // Update prochist if not timer that reruns same proc
+          acquire(&hist_lock);
           if (prochist[prev_hist_i].pid != p->pid) { 
             prochist[hist_i].pid = p->pid;
             safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
             prev_hist_i = hist_i;
             hist_i = (hist_i + 1) % HIST_SIZE;
           }
+          release(&hist_lock);
 
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
