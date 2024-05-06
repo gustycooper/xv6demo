@@ -740,7 +740,7 @@ procdump(void)
 
 // Display process history to console
 void
-prochist()
+prochistory()
 {
   int n = 0;
   for(int i=0; i<hist_i; i++){

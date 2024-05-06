@@ -147,7 +147,7 @@ sys_ps(void)
 uint64
 sys_prochist(void)
 {
-  prochist();
+  prochistory();
   return 0;
 }
 
