@@ -742,9 +742,8 @@ procdump(void)
 void
 prochistory()
 {
-  int n = 0;
   for(int i=0; i<hist_i; i++){
-    printf("%d %s", prochist[i]->pid, prochist[i]->name);
+    printf("%d %s", prochist[i].pid, prochist[i].name);
     printf("\n");
   }
 }
