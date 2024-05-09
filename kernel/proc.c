@@ -764,7 +764,7 @@ prochistory()
   int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
-    printf("%2d: %3d %s", i, prochist[j].pid, prochist[j].name);
+    printf("%d: %d %s", i, prochist[j].pid, prochist[j].name);
     printf("\n");
     j = (j + 1) % HIST_SIZE;
   }
