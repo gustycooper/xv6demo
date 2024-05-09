@@ -490,7 +490,7 @@ scheduler(void)
               prev_hist_i = hist_i;
               hist_i = (hist_i + 1) % HIST_SIZE;
               hist_c++;
-              if (hist_c > 16)
+              if (hist_c > HIST_SIZE)
                 hist_s = hist_c % HIST_SIZE;
             }
           }
@@ -758,7 +758,7 @@ void
 prochistory()
 {
   printf("Context Switches: %d, Total: %d, All: %d\n", hist_c, hist_t, hist_a);
-  int looplimit = hist_c < 16 ? hist_c : 16;
+  int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
     printf("%d %s", prochist[j].pid, prochist[j].name);

@@ -14,6 +14,6 @@
 #define SCHED_RR      0  // Round-Robin Scheduler
 #define SCHED_PRIOR   1  // Priority-Based Scheduler
 #define DEF_PRIOR     0  // Default proc priority
-#define HIST_SIZE    16  // Size of circular history buffer of scheduled procs
+#define HIST_SIZE    64  // Size of circular history buffer of scheduled procs
 
 
