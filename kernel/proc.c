@@ -22,6 +22,7 @@ int scheduler_policy = SCHED_RR;
 struct prochist prochist[HIST_SIZE];
 int hist_i = 0, prev_hist_i = 0;
 int hist_s = 0, hist_c = 0, hist_t = 0, hist_a = 0;
+int hist_q = 0;
 struct spinlock hist_lock;
 
 extern void forkret(void);
@@ -494,6 +495,8 @@ scheduler(void)
                 hist_s = hist_c % HIST_SIZE;
             }
           }
+          else
+            hist_q++;
           release(&hist_lock);
 
           // Switch to chosen process.  It is the process's job
@@ -757,7 +760,7 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Context Switches: %d, Total: %d, All: %d\n", hist_c, hist_t, hist_a);
+  printf("Context Switches: %d, Total: %d, All: %d\n, q: %d", hist_c, hist_t, hist_a, hist_q);
   int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
