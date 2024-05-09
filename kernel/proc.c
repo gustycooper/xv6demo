@@ -760,11 +760,11 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Context Switches: %d, Total: %d, All: %d\n, q: %d", hist_c, hist_t, hist_a, hist_q);
+  printf("Context Switches: %d, Total: %d, All: %d, q: %d/n", hist_c, hist_t, hist_a, hist_q);
   int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
-    printf("%d %s", prochist[j].pid, prochist[j].name);
+    printf("%2d: %3d %s", i, prochist[j].pid, prochist[j].name);
     printf("\n");
     j = (j + 1) % HIST_SIZE;
   }
