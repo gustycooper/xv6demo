@@ -468,6 +468,7 @@ proc_hist(struct proc *p)
   if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
     if (prochist[prev_hist_i].pid != p->pid || strncmp(p->name, "echo", 4) == 0){ 
       prochist[hist_i].pid = p->pid;
+      prochist[hist_i].priority = p->priority;
       safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
       prev_hist_i = hist_i;
       hist_i = (hist_i + 1) % HIST_SIZE;
@@ -772,7 +773,7 @@ prochistory()
   int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
-    printf("%d: %d %s", i, prochist[j].pid, prochist[j].name);
+    printf("%d: %d %s %d", i, prochist[j].pid, prochist[j].name, prochist[j].priority);
     printf("\n");
     j = (j + 1) % HIST_SIZE;
   }

@@ -117,5 +117,6 @@ struct proc {
 // stuct for history of procs scheduled
 struct prochist {
   int pid;
+  int priority;
   char name[16];
 };
