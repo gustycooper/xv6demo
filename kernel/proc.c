@@ -504,7 +504,7 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
-          proc_hist();
+          proc_hist(p);
 
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
@@ -527,7 +527,7 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
-          proc_hist();
+          proc_hist(p);
           // priority adjusted based on how long the process has been waiting
           // int aging_factor = currtime - p->readytime;
           // int effective_priority = p->priority + aging_factor;
