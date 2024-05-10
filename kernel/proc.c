@@ -16,7 +16,8 @@ int nextpid = 1;
 struct spinlock pid_lock;
 
 // assign scheduler_policy = SCHED_PRIOR for priority scheduler
-int scheduler_policy = SCHED_RR;
+//int scheduler_policy = SCHED_RR;
+int scheduler_policy = SCHED_PRIOR;
 
 // History of procs scheduled
 struct prochist prochist[HIST_SIZE];
