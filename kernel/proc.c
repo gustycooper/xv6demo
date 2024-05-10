@@ -543,7 +543,7 @@ scheduler(void)
       }
 
       if (selected) {
-        proc_hist(p);
+        proc_hist(selected);
         acquire(&selected->lock);
         selected->state = RUNNING;
         c->proc = selected;
