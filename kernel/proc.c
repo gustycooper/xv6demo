@@ -458,6 +458,29 @@ wait(uint64 addr)
   }
 }
 
+// Maintain history of scheduled procs
+void
+proc_hist(struct proc *p)
+{
+  // Update prochist if not timer that reruns same proc
+  acquire(&hist_lock);
+  hist_t++;
+  if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
+    if (prochist[prev_hist_i].pid != p->pid || strncmp(p->name, "echo", 4) == 0){ 
+      prochist[hist_i].pid = p->pid;
+      safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
+      prev_hist_i = hist_i;
+      hist_i = (hist_i + 1) % HIST_SIZE;
+      hist_c++;
+      if (hist_c > HIST_SIZE)
+        hist_s = hist_c % HIST_SIZE;
+    }
+  }
+  else
+    hist_q++;
+  release(&hist_lock);
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -476,28 +499,12 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
+    hist_a++;
     if (scheduler_policy == SCHED_RR) {
-      hist_a++;
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
-          // Update prochist if not timer that reruns same proc
-          acquire(&hist_lock);
-          hist_t++;
-          if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
-            if (prochist[prev_hist_i].pid != p->pid || strncmp(p->name, "echo", 4) == 0){ 
-              prochist[hist_i].pid = p->pid;
-              safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
-              prev_hist_i = hist_i;
-              hist_i = (hist_i + 1) % HIST_SIZE;
-              hist_c++;
-              if (hist_c > HIST_SIZE)
-                hist_s = hist_c % HIST_SIZE;
-            }
-          }
-          else
-            hist_q++;
-          release(&hist_lock);
+          proc_hist();
 
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
@@ -520,6 +527,7 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
+          proc_hist();
           // priority adjusted based on how long the process has been waiting
           // int aging_factor = currtime - p->readytime;
           // int effective_priority = p->priority + aging_factor;
