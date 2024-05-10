@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     if (pid == 0) {
       // Child process
       int priority = 50 + i;  // Assign priorities 50, 51, 52, 53, 54
-      //setpriority(priority);
+      setpriority(priority);
       for (volatile int j = 0; j < 100000000; j++);  // Spend some time
       fprintf(1, "Child %d with priority %d has finished!\n", getpid(), priority);
       exit(0);

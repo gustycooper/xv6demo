@@ -169,3 +169,20 @@ sys_sigreturn(void)
   p->ticks = 0;
   return p->trapframe->a0;
 }
+
+uint64
+sys_getpriority(void)
+{
+  return myproc()->priority;
+}
+
+uint64
+sys_setpriority(void) {
+  int new_priority;
+  if (argint(0, &new_priority) < 0) {
+    return -1;
+  }
+  struct proc* p = myproc();
+  p->priority = new_priority;
+  return 0;
+}

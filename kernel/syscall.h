@@ -28,3 +28,5 @@
 #define SYS_sigalarm 27
 #define SYS_sigreturn 28
 #define SYS_prochist 29
+#define SYS_getpriority 30
+#define SYS_setpriority 31

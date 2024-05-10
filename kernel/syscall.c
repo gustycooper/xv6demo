@@ -109,6 +109,9 @@ extern uint64 sys_ps(void);
 extern uint64 sys_sigalarm(void);
 extern uint64 sys_sigreturn(void);
 extern uint64 sys_prochist(void);
+extern uint64 sys_getpriority(void);
+extern uint64 sys_setpriority(void);
+
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -142,6 +145,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_sigalarm] sys_sigalarm,
 [SYS_sigreturn] sys_sigreturn,
 [SYS_prochist] sys_prochist,
+[SYS_getpriority] sys_getpriority,
+[SYS_setpriority] sys_setpriority,
 };
 
 static char *syscall_name[] = {
@@ -174,6 +179,8 @@ static char *syscall_name[] = {
 [SYS_sigalarm] "sigalarm",
 [SYS_sigreturn] "sigreturn",
 [SYS_prochist] "prochist",
+[SYS_getpriority] "getpriority",
+[SYS_setpriority] "setpriority",
 };
 
 void

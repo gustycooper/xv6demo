@@ -31,6 +31,8 @@ int ps(void);
 int prochist(void);
 int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
+int getpriority(void);
+int setpriority(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
