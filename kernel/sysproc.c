@@ -179,9 +179,7 @@ sys_getpriority(void)
 uint64
 sys_setpriority(void) {
   int new_priority;
-  if (argint(0, &new_priority) < 0) {
-    return -1;
-  }
+  argint(0, &new_priority);
   struct proc* p = myproc();
   p->priority = new_priority;
   return 0;
