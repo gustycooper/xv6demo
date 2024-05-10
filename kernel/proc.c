@@ -529,7 +529,6 @@ scheduler(void)
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
-          proc_hist(p);
           // priority adjusted based on how long the process has been waiting
           // int aging_factor = currtime - p->readytime;
           // int effective_priority = p->priority + aging_factor;
@@ -544,6 +543,7 @@ scheduler(void)
       }
 
       if (selected) {
+        proc_hist(p);
         acquire(&selected->lock);
         selected->state = RUNNING;
         c->proc = selected;
