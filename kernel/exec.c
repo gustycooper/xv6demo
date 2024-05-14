@@ -39,6 +39,13 @@ exec(char *path, char **argv)
   }
   ilock(ip);
 
+  // Save program name for debugging.
+  for(last=s=path; *s; s++)
+    if(*s == '/')
+      last = s+1;
+  safestrcpy(p->name, last, sizeof(p->name));
+    
+
   // Check ELF header
   if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
@@ -75,6 +82,12 @@ exec(char *path, char **argv)
   p = myproc();
   uint64 oldsz = p->sz;
 
+  // Save program name for debugging.
+  for(last=s=path; *s; s++)
+    if(*s == '/')
+      last = s+1;
+  safestrcpy(p->name, last, sizeof(p->name));
+    
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible as a stack guard.
   // Use the second as the user stack.
@@ -114,12 +127,6 @@ exec(char *path, char **argv)
   // value, which goes in a0.
   p->trapframe->a1 = sp;
 
-  // Save program name for debugging.
-  for(last=s=path; *s; s++)
-    if(*s == '/')
-      last = s+1;
-  safestrcpy(p->name, last, sizeof(p->name));
-    
   // Commit to the user image.
   oldpagetable = p->pagetable;
   p->pagetable = pagetable;

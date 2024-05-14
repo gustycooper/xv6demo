@@ -16,14 +16,16 @@ int nextpid = 1;
 struct spinlock pid_lock;
 
 // assign scheduler_policy = SCHED_PRIOR for priority scheduler
-//int scheduler_policy = SCHED_RR;
-int scheduler_policy = SCHED_PRIOR;
+int scheduler_policy = SCHED_RR;
+//int scheduler_policy = SCHED_PRIOR;
 
-// History of procs scheduled
-struct prochist prochist[HIST_SIZE];
-int hist_i = 0, prev_hist_i = 0;
-int hist_s = 0, hist_c = 0, hist_t = 0, hist_a = 0;
-int hist_q = 0;
+struct prochist prochist[HIST_SIZE]; // history of procs scheduled
+int hist_i = 0, prev_hist_i = 0; // indices into prochist[]
+int hist_s = 0; // start index in prochist[] to display
+int hist_c = 0; // num of context switches to a new proc and not shell
+int hist_t = 0; // num of context switches
+int hist_a = 0; // num of timer interrupts
+int hist_q = 0; // num of context switches to shell
 struct spinlock hist_lock;
 
 extern void forkret(void);
@@ -467,9 +469,10 @@ proc_hist(struct proc *p)
   acquire(&hist_lock);
   hist_t++;
   if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
-    if (prochist[prev_hist_i].pid != p->pid || strncmp(p->name, "echo", 4) == 0){ 
+    if (prochist[prev_hist_i].pid != p->pid){ 
       prochist[hist_i].pid = p->pid;
       prochist[hist_i].priority = p->priority;
+      prochist[hist_i].cpuid = cpuid();
       safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
       prev_hist_i = hist_i;
       hist_i = (hist_i + 1) % HIST_SIZE;
@@ -522,29 +525,36 @@ scheduler(void)
         release(&p->lock);
       }
     }
-    else { // scheduler_policy == SCHED_PRIOR
-      struct proc *selected = 0;
+    else if (scheduler_policy == SCHED_PRIOR) {
+      struct proc *selected = 0, *prev_sel = 0;
       int highest_priority = -1;
 
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
           // priority adjusted based on how long the process has been waiting
+          int aging_factor = 0; // ignore aging for now
           // int aging_factor = currtime - p->readytime;
-          // int effective_priority = p->priority + aging_factor;
-          // ignore aging for now
-          int effective_priority = p->priority;
+          int effective_priority = p->priority + aging_factor;
           if (effective_priority > highest_priority) {
             highest_priority = effective_priority;
+            prev_sel = selected;
             selected = p;
           }
+          if (prev_sel)
+            prev_sel->state = RUNNABLE;
+          selected->state = RUNNING;
+          c->proc = selected;
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
         }
         release(&p->lock);
       }
-
       if (selected) {
-        proc_hist(selected);
         acquire(&selected->lock);
+        proc_hist(selected);
         selected->state = RUNNING;
         c->proc = selected;
         swtch(&c->context, &selected->context);
@@ -770,11 +780,11 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Context Switches: %d, Total: %d, All: %d, q: %d\n", hist_c, hist_t, hist_a, hist_q);
+  printf("Swtch New Proc: %d, Swtchs: %d, Rupts: %d, Swtch sh: %d\n", hist_c, hist_t, hist_a, hist_q);
   int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
-    printf("%d: %d %s %d", i, prochist[j].pid, prochist[j].name, prochist[j].priority);
+    printf("%d: %d %d %s %d", i, prochist[j].cpuid, prochist[j].pid, prochist[j].name, prochist[j].priority);
     printf("\n");
     j = (j + 1) % HIST_SIZE;
   }

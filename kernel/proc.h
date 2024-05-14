@@ -118,5 +118,6 @@ struct proc {
 struct prochist {
   int pid;
   int priority;
+  int cpuid;
   char name[16];
 };

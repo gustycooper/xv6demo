@@ -2,36 +2,105 @@
 #include "user/user.h"
 #include "kernel/stat.h"
 
+int p1[2], p2[2], p3[2];
+
+void proc1() {
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  setpriority(50);
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  close(p1[1]);
+  char buf[1];
+  read(p1[0], buf, sizeof(buf));
+  close(p1[0]);
+  int ii = 0;
+  for (volatile int j = 0; j < 100000000; j++)
+    for (volatile int k = 0; k < 10; k++)
+      ii++;  // Spend some time
+  fprintf(1, "Child %d with priority %d has finished!\n", getpid(), getpriority());
+  exit(0);
+}
+
+void proc2() {
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  setpriority(51);
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  close(p2[1]);
+  char buf[1];
+  read(p2[0], buf, sizeof(buf));
+  close(p2[0]);
+  int ii = 0;
+  for (volatile int j = 0; j < 100000000; j++)
+    for (volatile int k = 0; k < 10; k++)
+      ii++;  // Spend some time
+  fprintf(1, "Child %d with priority %d has finished!\n", getpid(), getpriority());
+  exit(0);
+}
+
+void proc3() {
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  setpriority(52);
+  fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
+  close(p3[1]);
+  char buf[1];
+  read(p3[0], buf, sizeof(buf));
+  close(p3[0]);
+  int ii = 0;
+  for (volatile int j = 0; j < 100000000; j++)
+    for (volatile int k = 0; k < 10; k++)
+      ii++;  // Spend some time
+  fprintf(1, "Child %d with priority %d has finished!\n", getpid(), getpriority());
+  exit(0);
+}
+
+
 int main(int argc, char **argv)
 {
   int childprocs = 3;
-  int parent_pid = getpid();
-  //int child_pids[5];
+  setpriority(60);
 
-  for (int i = 0; i < childprocs; i++) {
-    int pid = fork();
-    if (pid == 0) {
-      // Child process
-      int priority = 50 + i;  // Assign priorities 50, 51, 52, 53, 54
-      setpriority(priority);
-      for (volatile int j = 0; j < 100000000; j++);  // Spend some time
-      fprintf(1, "Child %d with priority %d has finished!\n", getpid(), priority);
-      exit(0);
-    } else if (pid > 0) {
-      //child_pids[i] = pid;
+  pipe(p1);
+  pipe(p2);
+  pipe(p3);
+
+  int pid = fork();
+  if (pid == 0) {         // child
+    proc1();
+  } 
+  else if (pid > 0) {     // parent
+    pid = fork();
+    if (pid == 0) {       // child
+      proc2();
+    } 
+    else if (pid > 0) {   // parent
+      pid = fork();
+      if (pid == 0) {     // child
+        proc3();
+      } 
+      else if (pid > 0) { // parent
+        fprintf(1, "Parent Sleeping - let children get priorities set.\n");
+        sleep(10);
+        fprintf(1, "Starting child 1\n");
+        write(p1[1], "a", 1);
+        fprintf(1, "Starting child 2\n");
+        write(p2[1], "b", 1);
+        fprintf(1, "Starting child 3\n");
+        write(p3[1], "c", 1);
+        for (int i = 0; i < childprocs; i++) {
+          wait(0);
+        }
+        fprintf(1, "All children have finished!\n");
+      }
+      else {
+        fprintf(1, "Fork 3 failed\n");
+        exit(0);
+      }
     } else {
-      fprintf(1, "Fork failed\n");
+      fprintf(1, "Fork 2 failed\n");
       exit(0);
     }
+  } else {
+    fprintf(1, "Fork 1 failed\n");
+    exit(0);
   }
-
-  if (getpid() == parent_pid) {
-    // Parent process
-    for (int i = 0; i < childprocs; i++) {
-      wait(0);
-    }
-    fprintf(1, "All children have finished!\n");
-  }
-
   exit(0);
 }
