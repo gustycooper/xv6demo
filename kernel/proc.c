@@ -22,10 +22,15 @@ int scheduler_policy = SCHED_RR;
 struct prochist prochist[HIST_SIZE]; // history of procs scheduled
 int hist_i = 0, prev_hist_i = 0; // indices into prochist[]
 int hist_s = 0; // start index in prochist[] to display
-int hist_c = 0; // num of context switches to a new proc and not shell
-int hist_t = 0; // num of context switches
-int hist_a = 0; // num of timer interrupts
-int hist_q = 0; // num of context switches to shell
+int hist_new = 0; // num of context switches to a new proc, not shell
+// NOTE: hist_new is also total number of entries entered into prochist[]
+// which of course gets circulared when greater the HIST_SIZE
+int hist_old = 0; // num of context switches from procA to procA
+int hist_run = 0; // num of context switches to a RUNNABLE proc
+int hist_tmr = 0; // num of timer interrupts
+// NOTE: On round robin, hist_tmr is incremented in outer for(;;) loop,
+// and misses some timer rupts from  for(p = proc; p < &proc[NPROC]; p++) loop.
+int hist_sh = 0; // num of context switches to shell
 struct spinlock hist_lock;
 
 extern void forkret(void);
@@ -467,7 +472,7 @@ proc_hist(struct proc *p)
 {
   // Update prochist if not timer that reruns same proc
   acquire(&hist_lock);
-  hist_t++;
+  hist_run++;
   if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
     if (prochist[prev_hist_i].pid != p->pid){ 
       prochist[hist_i].pid = p->pid;
@@ -476,13 +481,15 @@ proc_hist(struct proc *p)
       safestrcpy(prochist[hist_i].name, p->name, sizeof(p->name));
       prev_hist_i = hist_i;
       hist_i = (hist_i + 1) % HIST_SIZE;
-      hist_c++;
-      if (hist_c > HIST_SIZE)
-        hist_s = hist_c % HIST_SIZE;
+      hist_new++;
+      if (hist_new > HIST_SIZE)
+        hist_s = hist_new % HIST_SIZE;
     }
+    else
+      hist_old++;
   }
   else
-    hist_q++;
+    hist_sh++;
   release(&hist_lock);
 }
 
@@ -504,7 +511,7 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    hist_a++;
+    hist_tmr++;
     if (scheduler_policy == SCHED_RR) {
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
@@ -780,8 +787,8 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Swtch New Proc: %d, Swtchs: %d, Rupts: %d, Swtch sh: %d\n", hist_c, hist_t, hist_a, hist_q);
-  int looplimit = hist_c < HIST_SIZE ? hist_c : HIST_SIZE;
+  printf("Tmr Rupts: %d, Swtch Run: %d, Swtch New: %d, Switch Old: %d, Swtch sh: %d\n", hist_tmr, hist_run, hist_new, hist_old, hist_sh);
+  int looplimit = hist_new < HIST_SIZE ? hist_new : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
     printf("%d: %d %d %s %d", i, prochist[j].cpuid, prochist[j].pid, prochist[j].name, prochist[j].priority);
