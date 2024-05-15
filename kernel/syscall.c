@@ -111,6 +111,7 @@ extern uint64 sys_sigreturn(void);
 extern uint64 sys_prochist(void);
 extern uint64 sys_getpriority(void);
 extern uint64 sys_setpriority(void);
+extern uint64 sys_spoon(void);
 
 
 // An array mapping syscall numbers from syscall.h
@@ -147,6 +148,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_prochist] sys_prochist,
 [SYS_getpriority] sys_getpriority,
 [SYS_setpriority] sys_setpriority,
+[SYS_spoon] sys_spoon,
 };
 
 static char *syscall_name[] = {
@@ -181,6 +183,7 @@ static char *syscall_name[] = {
 [SYS_prochist] "prochist",
 [SYS_getpriority] "getpriority",
 [SYS_setpriority] "setpriority",
+[SYS_spoon] "spoon",
 };
 
 void

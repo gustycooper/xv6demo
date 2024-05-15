@@ -30,3 +30,4 @@
 #define SYS_prochist 29
 #define SYS_getpriority 30
 #define SYS_setpriority 31
+#define SYS_spoon 32

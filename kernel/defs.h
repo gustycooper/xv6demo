@@ -111,6 +111,7 @@ void            procdump(void);
 int             get_nproc(void);
 int             ps(void);
 void            prochistory(void);
+int             spoon(char*);
 
 // swtch.S
 void            swtch(struct context*, struct context*);
