@@ -33,6 +33,7 @@ int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
 int getpriority(void);
 int setpriority(int);
+int spoon(char*);
 
 // ulib.c
 int stat(const char*, struct stat*);

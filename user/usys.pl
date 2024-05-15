@@ -46,3 +46,4 @@ entry("sigreturn");
 entry("prochist");
 entry("getpriority");
 entry("setpriority");
+entry("spoon");

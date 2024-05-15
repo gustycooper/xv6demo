@@ -70,17 +70,17 @@ int main(int argc, char **argv)
   pipe(p2);
   pipe(p3);
 
-  int pid = fork();
+  int pid = spoon("Colett");
   if (pid == 0) {         // child
     proc1();
   } 
   else if (pid > 0) {     // parent
-    pid = fork();
+    pid = spoon("Opal");
     if (pid == 0) {       // child
       proc2();
     } 
     else if (pid > 0) {   // parent
-      pid = fork();
+      pid = spoon("Florence");
       if (pid == 0) {     // child
         proc3();
       } 
