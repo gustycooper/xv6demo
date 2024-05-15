@@ -15,22 +15,22 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
-// assign scheduler_policy = SCHED_PRIOR for priority scheduler
+// scheduler_policy selects either SCHED_RR or SCHED_PRIOR
 int scheduler_policy = SCHED_RR;
 //int scheduler_policy = SCHED_PRIOR;
 
 struct prochist prochist[HIST_SIZE]; // history of procs scheduled
 int hist_i = 0, prev_hist_i = 0; // indices into prochist[]
-int hist_s = 0; // start index in prochist[] to display
-int hist_new = 0; // num of context switches to a new proc, not shell
+int hist_s = 0;       // start index in prochist[] to display
+int hist_new = 0;     // num of context switches to a new proc, not shell
 // NOTE: hist_new is also total number of entries entered into prochist[]
 // which of course gets circulared when greater the HIST_SIZE
-int hist_old = 0; // num of context switches from procA to procA
-int hist_run = 0; // num of context switches to a RUNNABLE proc
-int hist_tmr = 0; // num of timer interrupts
-// NOTE: On round robin, hist_tmr is incremented in outer for(;;) loop,
-// and misses some timer rupts from  for(p = proc; p < &proc[NPROC]; p++) loop.
-int hist_sh = 0; // num of context switches to shell
+int hist_old = 0;     // num of context switches from procA to procA
+int hist_run = 0;     // num of context switches to a RUNNABLE proc
+int hist_sch = 0;     // num of iterations of scheduler()'s outer loop.
+// NOTE: On round robin, hist_sch does not count the number of
+// iterations in the inner for(p = proc; p < &proc[NPROC]; p++) loop.
+int hist_sh = 0;     // num of context switches to shell
 struct spinlock hist_lock;
 
 extern void forkret(void);
@@ -470,7 +470,7 @@ wait(uint64 addr)
 void
 proc_hist(struct proc *p)
 {
-  // Update prochist if not timer that reruns same proc
+  // Update prochist if not moving same proc from RUNNABLE to RUNNING
   acquire(&hist_lock);
   hist_run++;
   if (strncmp(p->name, "sh", sizeof(p->name))) { // if proc is not shell
@@ -511,7 +511,7 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    hist_tmr++;
+    hist_sch++;
     if (scheduler_policy == SCHED_RR) {
       for(p = proc; p < &proc[NPROC]; p++) {
         acquire(&p->lock);
@@ -787,7 +787,7 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Tmr Rupts: %d, Swtch Run: %d, Swtch New: %d, Switch Old: %d, Swtch sh: %d\n", hist_tmr, hist_run, hist_new, hist_old, hist_sh);
+  printf("Tmr Rupts: %d, Swtch Run: %d, Swtch New: %d, Switch Old: %d, Swtch sh: %d\n", hist_sch, hist_run, hist_new, hist_old, hist_sh);
   int looplimit = hist_new < HIST_SIZE ? hist_new : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){
