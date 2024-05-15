@@ -842,7 +842,7 @@ procdump(void)
 void
 prochistory()
 {
-  printf("Tmr Rupts: %d, Swtch Run: %d, Swtch New: %d, Switch Old: %d, Swtch sh: %d\n", hist_sch, hist_run, hist_new, hist_old, hist_sh);
+  printf("Tmr Rupts: %d, Sch Loops: %d, Swtch Run: %d, Swtch New: %d, Switch Old: %d, Swtch sh: %d\n", ticks, hist_sch, hist_run, hist_new, hist_old, hist_sh);
   int looplimit = hist_new < HIST_SIZE ? hist_new : HIST_SIZE;
   int j = hist_s;
   for(int i=0; i<looplimit; i++){

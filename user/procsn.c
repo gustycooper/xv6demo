@@ -70,7 +70,7 @@ int main(int argc, char **argv)
   pipe(p2);
   pipe(p3);
 
-  int pid = spoon("Colett");
+  int pid = spoon("Coletta");
   if (pid == 0) {         // child
     proc1();
   } 
