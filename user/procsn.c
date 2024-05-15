@@ -2,11 +2,12 @@
 #include "user/user.h"
 #include "kernel/stat.h"
 
+int priorities[3] = { 50, 51, 52 };
 int p1[2], p2[2], p3[2];
 
 void proc1() {
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
-  setpriority(50);
+  setpriority(priorities[0]);
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
   close(p1[1]);
   char buf[1];
@@ -22,7 +23,7 @@ void proc1() {
 
 void proc2() {
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
-  setpriority(51);
+  setpriority(priorities[1]);
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
   close(p2[1]);
   char buf[1];
@@ -38,7 +39,7 @@ void proc2() {
 
 void proc3() {
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
-  setpriority(52);
+  setpriority(priorities[2]);
   fprintf(1, "Child %d, priority %d!\n", getpid(), getpriority());
   close(p3[1]);
   char buf[1];
@@ -55,8 +56,15 @@ void proc3() {
 
 int main(int argc, char **argv)
 {
+  if (argc >= 2)
+    priorities[0] = atoi(argv[1]);
+  if (argc >= 3)
+    priorities[1] = atoi(argv[2]);
+  if (argc >= 3)
+    priorities[2] = atoi(argv[3]);
+
   int childprocs = 3;
-  setpriority(60);
+  setpriority(100); // parent has highest priority
 
   pipe(p1);
   pipe(p2);
