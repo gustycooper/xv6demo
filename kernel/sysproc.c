@@ -189,7 +189,7 @@ uint64
 sys_spoon(void) {
   char procname[16];
 
-  if((n = argstr(0, procname, 16)) < 0)
+  if(argstr(0, procname, 16) < 0)
     return -1;
 
   return spoon(procname);
