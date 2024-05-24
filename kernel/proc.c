@@ -559,6 +559,8 @@ void
 scheduler(void)
 {
   struct proc *p;
+// prior schd uses start to perform RR on equal highest priorities
+  struct proc *start = proc;
   struct cpu *c = mycpu();
 
   c->proc = 0;
@@ -591,7 +593,8 @@ scheduler(void)
       struct proc *selected = 0, *prev_sel = 0;
       int highest_priority = -1;
 
-      for(p = proc; p < &proc[NPROC]; p++) {
+      int i = 0;
+      for(p = start; i < NPROC; i++) {
         acquire(&p->lock);
         if(p->state == RUNNABLE) {
           // priority adjusted based on how long the process has been waiting
@@ -613,8 +616,15 @@ scheduler(void)
           c->proc = 0;
         }
         release(&p->lock);
+
+        p++;
+        if (p >= &proc[NPROC])
+          p = proc;
       }
       if (selected) {
+        start = selected + 1;
+        if (start >= &proc[NPROC])
+          start = proc;
         acquire(&selected->lock);
         proc_hist(selected);
         selected->state = RUNNING;
